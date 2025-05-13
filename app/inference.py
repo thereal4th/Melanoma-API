@@ -43,6 +43,8 @@ def load_models():
 
 
 def predict_melanoma(image: Image.Image, seg_model, clf_model, threshold=0.5, min_pixels=5000):
+
+    print("Predicting melanoma...")
     seg_input = segmentation_transform(image).unsqueeze(0).to(device)
 
     with torch.no_grad():

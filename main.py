@@ -17,9 +17,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load models at startup
-seg_model, clf_model = load_models()
-
 '''@app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     try:
@@ -32,24 +29,29 @@ async def predict(file: UploadFile = File(...)):
 
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})'''
+
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     try:
-        print("📦 Received a request to /predict")
+
+        print("Received a request to /predict")
+
+        # Load models at startup
+        seg_model, clf_model = load_models()
 
         contents = await file.read()
-        print(f"📏 File size: {len(contents)} bytes")
+        print(f"File size: {len(contents)} bytes")
 
         image = Image.open(io.BytesIO(contents)).convert("RGB")
         print("🖼 Image loaded successfully")
 
         prob, _, _, _ = predict_melanoma(image, seg_model, clf_model)
-        print(f"📊 Prediction probability: {prob}")
+        print(f"Prediction probability: {prob}")
 
         return JSONResponse(content={"probability": round(prob, 4)})
 
     except Exception as e:
-        print(f"❌ Exception in /predict: {e}")
+        print(f"Exception in /predict: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 
