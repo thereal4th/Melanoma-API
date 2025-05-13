@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-'''# Load models at startup
+# Load models at startup
 seg_model, clf_model = load_models()
 
 @app.post("/predict")
@@ -31,9 +31,7 @@ async def predict(file: UploadFile = File(...)):
         return JSONResponse(content={"probability": round(prob, 4)})
 
     except Exception as e:
-        return JSONResponse(status_code=500, content={"error": str(e)})'''
-
-app = FastAPI()
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 @app.get("/")
 def read_root():
