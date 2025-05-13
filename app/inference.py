@@ -4,6 +4,7 @@ from torchvision import transforms
 from pathlib import Path
 from PIL import Image
 import numpy as np
+import os
 from app.models import UNet, MelanomaClassifier  # Import model architectures
 from app.utils import circular_crop  # circular crop utility
 
@@ -24,6 +25,8 @@ def load_models():
     try:
         ROOT_DIR = Path(__file__).resolve().parents[1]
         MODEL_DIR = ROOT_DIR / "trained_weights"
+        print("🔍 CWD:", os.getcwd(), flush=True)
+        print("📂 Listing weights dir:", os.listdir(MODEL_DIR), flush=True)
 
         seg_model = UNet(n_channels=3, n_classes=1, bilinear=False)
         seg_model.load_state_dict(torch.load(MODEL_DIR / "unet_dice0.8369_save1746204838.pt", map_location=device))
