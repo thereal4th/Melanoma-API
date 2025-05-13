@@ -21,6 +21,7 @@ classification_transform = transforms.Compose([
 ])
 
 def load_models():
+
     ROOT_DIR = Path(__file__).resolve().parents[1]  # Go up from app/ to root/
     MODEL_DIR = ROOT_DIR / "trained_weights"
 
@@ -37,6 +38,8 @@ def load_models():
     # this classifier above was trained on zero normalization for the segmentation_transform
     clf_model.load_state_dict(checkpoint["model_state_dict"])
     clf_model.to(device).eval()
+
+    print("load_models: Models loaded succesfully")
 
     return seg_model, clf_model
 
