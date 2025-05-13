@@ -34,11 +34,11 @@ def load_models():
         clf_model.load_state_dict(checkpoint["model_state_dict"])
         clf_model.to(device).eval()
 
-        print("✅ Models loaded successfully.")
+        print("Models loaded successfully.")
         return seg_model, clf_model
 
     except Exception as e:
-        print(f"❌ Error loading models: {e}")
+        print(f"Error loading models: {e}")
         raise RuntimeError("Failed to load models") from e
 
 

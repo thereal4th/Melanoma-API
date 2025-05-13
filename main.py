@@ -57,3 +57,10 @@ async def predict(file: UploadFile = File(...)):
 def read_root():
     return {"message": "It works!"}
 
+@app.post("/test-upload")
+async def test_upload(file: UploadFile = File(...)):
+    contents = await file.read()
+    print(f"🧪 test-upload: Received {file.filename} of size {len(contents)} bytes")
+    return {"filename": file.filename, "size_kb": len(contents) // 1024}
+
+
