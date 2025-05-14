@@ -63,15 +63,17 @@ async def predict(file: UploadFile = File(...)):
 
 @app.get("/")
 def read_root():
+    print("get request received", flush = True)
     return {"message": "It works!"}
 
 @app.post("/test-upload")
 async def test_upload(file: UploadFile = File(...)):
-    '''contents = await file.read()
+    contents = await file.read()
     print(f"🧪 test-upload: Received {file.filename} of size {len(contents)} bytes")
-    return {"filename": file.filename, "size_kb": len(contents) // 1024}'''
-
-    seg_model, clf_model = load_models()
+    print("running test-upload", flush = True)
+    return {"filename": file.filename, "size_kb": len(contents) // 1024}
+    
+    #seg_model, clf_model = load_models()
 
 
 
