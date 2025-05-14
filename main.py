@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.inference import load_models, predict_melanoma
 from PIL import Image
 import io
+import traceback
 
 app = FastAPI()
 
@@ -55,6 +56,7 @@ async def predict(file: UploadFile = File(...)):
 
     except Exception as e:
         print(f"Exception in /predict: {e}", flush=True)
+        traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 
