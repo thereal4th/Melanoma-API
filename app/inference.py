@@ -8,7 +8,9 @@ import os
 from app.models import UNet, MelanomaClassifier  # Import model architectures
 from app.utils import circular_crop  # circular crop utility
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+device = torch.device("cpu")
     
 segmentation_transform = transforms.Compose([
     transforms.Resize((300, 300)),
@@ -50,7 +52,7 @@ def predict_melanoma(image: Image.Image, seg_model, clf_model, threshold=0.5, mi
     print("Predicting melanoma...", flush = True)
     seg_input = segmentation_transform(image).unsqueeze(0).to(device)
 
-    print(f"seg_input moved to{device}", flush = True)
+    print(f"seg_input transformed and moved to {device}", flush = True)
 
     with torch.no_grad():
         mask_pred = seg_model(seg_input)
