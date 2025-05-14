@@ -35,7 +35,7 @@ async def predict(file: UploadFile = File(...)):
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    try:
+    '''try:
 
         print("Received a request to /predict")
 
@@ -55,7 +55,11 @@ async def predict(file: UploadFile = File(...)):
 
     except Exception as e:
         print(f"Exception in /predict: {e}")
-        return JSONResponse(status_code=500, content={"error": str(e)})
+        return JSONResponse(status_code=500, content={"error": str(e)})'''
+    
+    contents = await file.read()
+    print(f"🧪 test-upload: Received {file.filename} of size {len(contents)} bytes")
+    return {"filename": file.filename, "size_kb": len(contents) // 1024}
 
 
 @app.get("/")
