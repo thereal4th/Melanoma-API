@@ -88,3 +88,20 @@ def predict_melanoma(image: Image.Image, seg_model, clf_model, threshold=0.5, mi
 
     print("Segmentation and classification complete, returning outputs", flush = True)
     return prob, image, mask_resized if pixel_count >= min_pixels else None, processed_image
+
+def predict_melanoma_nosegment(image: Image.Image, clf_model):
+
+    processed_image = circular_crop(image)
+    print("Cropped image", flush = True)
+
+    clf_input = classification_transform(processed_image).unsqueeze(0).to(device)
+    print("Transform mask for classifier input", flush = True)
+
+    with torch.no_grad():
+        output = clf_model(clf_input)
+        prob = torch.sigmoid(output).item()
+        print("Ran classifier", flush = True)
+
+    print("Classification complete, returning outputs", flush = True)
+    return prob, image, processed_image
+

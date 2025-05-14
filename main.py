@@ -2,7 +2,7 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from app.inference import load_models, predict_melanoma
+from app.inference import load_models, predict_melanoma, predict_melanoma_nosegment
 from PIL import Image
 import io
 import traceback
@@ -59,6 +59,24 @@ async def predict(file: UploadFile = File(...)):
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
 
+@app.post("/predict_nosegment")
+async def predict_nosegment(file: UploadFile = File(...)):
+    try:
+        print("Received a request to /predict_nosegment")
+
+        contents = await file.read()
+
+        image = Image.open(io.BytesIO(contents)).convert("RGB")
+
+        prob, _, _ = predict_melanoma_nosegment(image, clf_model)
+        print(f"Prediction probability: {prob}", flush=True)
+
+        return JSONResponse(content={"probability": round(prob, 4)})
+
+    except Exception as e:
+        print(f"Exception in /predict: {e}", flush=True)
+        traceback.print_exc()
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 
 @app.get("/")
