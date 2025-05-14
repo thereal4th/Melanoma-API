@@ -55,6 +55,7 @@ def predict_melanoma(image: Image.Image, seg_model, clf_model, threshold=0.5, mi
     print(f"seg_input transformed and moved to {device}", flush = True)
 
     with torch.no_grad():
+        print(f"seg_input shape: {seg_input.shape}", flush=True)
         mask_pred = seg_model(seg_input)
         mask_pred = (mask_pred > threshold).float()
     
