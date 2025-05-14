@@ -47,18 +47,25 @@ def load_models():
 
 def predict_melanoma(image: Image.Image, seg_model, clf_model, threshold=0.5, min_pixels=5000):
 
-    print("Predicting melanoma...")
+    print("Predicting melanoma...", flush = True)
     seg_input = segmentation_transform(image).unsqueeze(0).to(device)
+
+    print(f"seg_input moved to{device}", flush = True)
 
     with torch.no_grad():
         mask_pred = seg_model(seg_input)
         mask_pred = (mask_pred > threshold).float()
+    
+    print("Created mask_pred", flush = True)
 
     mask_np = mask_pred.squeeze().cpu().numpy()
     pixel_count = (mask_np > 0).sum()
 
+    print("Calculated pixel_count", flush = True)
+
     if pixel_count < min_pixels:
         processed_image = circular_crop(image)
+        print("Cropped image (pixel count below threshold)", flush = True)
     else:
         mask_resized = Image.fromarray((mask_np * 255).astype("uint8")).resize(image.size)
         mask_np_resized = np.array(mask_resized) / 255.0
@@ -66,11 +73,15 @@ def predict_melanoma(image: Image.Image, seg_model, clf_model, threshold=0.5, mi
         image_np = np.array(image)
         segmented_np = (image_np * mask_np_exp).astype("uint8")
         processed_image = Image.fromarray(segmented_np)
+        print("Segmentation completed", flush = True)
 
     clf_input = classification_transform(processed_image).unsqueeze(0).to(device)
+    print("Transform mask for classifier input", flush = True)
 
     with torch.no_grad():
         output = clf_model(clf_input)
         prob = torch.sigmoid(output).item()
+        print("Input segmented image to classifier", flush = True)
 
+    print("Segmentation and classification complete, returning outputs", flush = True)
     return prob, image, mask_resized if pixel_count >= min_pixels else None, processed_image
