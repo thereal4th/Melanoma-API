@@ -2,15 +2,12 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from app.inference import load_models, predict_melanoma, predict_melanoma_nosegment
+from app.inference import load_models, predict_melanoma, predict_melanoma_nosegment, load_models_finetuned
 from PIL import Image
 import io
 import traceback
 
 app = FastAPI()
-
-# Load models at startup
-seg_model, clf_model = load_models()
 
 # Add CORS middleware
 app.add_middleware(
@@ -38,6 +35,9 @@ async def predict(file: UploadFile = File(...)):
 async def predict(file: UploadFile = File(...)):
     try:
 
+        # Load models
+        seg_model, clf_model = load_models()
+
         print("Received a request to /predict", flush=True)
 
         # TEMP Load models inside the route for testing
@@ -59,16 +59,21 @@ async def predict(file: UploadFile = File(...)):
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
 
-@app.post("/predict_nosegment")
+@app.post("/predict_finetuned")
 async def predict_nosegment(file: UploadFile = File(...)):
     try:
-        print("Received a request to /predict_nosegment")
+        
+        #Load fine-tuned model
+        seg_model, clf_model = load_models_finetuned()
+
+        print("Received a request to /predict_finetuned")
 
         contents = await file.read()
+        print(f"File size: {len(contents)} bytes", flush=True)
 
         image = Image.open(io.BytesIO(contents)).convert("RGB")
 
-        prob, _, _ = predict_melanoma_nosegment(image, clf_model)
+        prob, _, _, _ = predict_melanoma(image, seg_model, clf_model)
         print(f"Prediction probability: {prob}", flush=True)
 
         return JSONResponse(content={"probability": round(prob, 4)})

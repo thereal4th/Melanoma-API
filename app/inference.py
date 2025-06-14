@@ -45,6 +45,29 @@ def load_models():
     except Exception as e:
         print(f"Error loading models: {e}")
         raise RuntimeError("Failed to load models") from e
+    
+def load_models_finetuned():
+    try:
+        ROOT_DIR = Path(__file__).resolve().parents[1]
+        MODEL_DIR = ROOT_DIR / "trained_weights"
+        print("🔍 CWD:", os.getcwd(), flush=True)
+        print("📂 Listing weights dir:", os.listdir(MODEL_DIR), flush=True)
+
+        seg_model = UNet(n_channels=3, n_classes=1, bilinear=False)
+        seg_model.load_state_dict(torch.load(MODEL_DIR / "unet_dice0.8369_save1746204838.pt", map_location=device))
+        seg_model.to(device).eval()
+
+        clf_model = MelanomaClassifier(input_shape=3, hidden_units=10, output_shape=1).to(device)
+        checkpoint = torch.load(MODEL_DIR / "model_with-UNET_epoch16+3+16-finetuned_acc0.5493_thres0.5_minpixel5000_batch8.pth", map_location=device)
+        clf_model.load_state_dict(checkpoint["model_state_dict"])
+        clf_model.to(device).eval()
+
+        print("Models loaded successfully.")
+        return seg_model, clf_model
+
+    except Exception as e:
+        print(f"Error loading models: {e}")
+        raise RuntimeError("Failed to load models") from e
 
 
 def predict_melanoma(image: Image.Image, seg_model, clf_model, threshold=0.5, min_pixels=5000):
